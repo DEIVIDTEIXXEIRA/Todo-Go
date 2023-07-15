@@ -3,6 +3,7 @@ package repositorios
 import (
 	"api/src/modelos"
 	"database/sql"
+	"fmt"
 )
 
 type Usuarios struct {
@@ -33,5 +34,37 @@ func (repositorio Usuarios) Criar(usuario modelos.Usuarios) (uint64, error) {
 		return 0, erro
 	}
 
-	return uint64(ultimoIdInserido), nil 
+	return uint64(ultimoIdInserido), nil
+}
+
+func (repostorio Usuarios) Buscar(NomeouNick string) ([]modelos.Usuarios, error) {
+	NomeouNick = fmt.Sprintf("%%%s%%", NomeouNick)
+
+	linhas, erro := repostorio.db.Query(
+		"select id, nome, nick, email from usuarios where nome LIKE ? or nick LIKE ?",
+		NomeouNick, NomeouNick,
+	)
+	if erro != nil {
+		return nil, erro
+	}
+	defer linhas.Close()
+
+	var usuarios []modelos.Usuarios
+
+	for linhas.Next() {
+		var usuario modelos.Usuarios
+
+		if erro = linhas.Scan(
+			&usuario.Id,
+			&usuario.Nome,
+			&usuario.Nick,
+			&usuario.Email,
+		); erro != nil {
+			return nil, erro
+		}
+
+		usuarios = append(usuarios, usuario)
+	}
+
+	return usuarios, nil
 }
