@@ -14,15 +14,16 @@ type Usuarios struct {
 	Senha string `json:"senha,omitempty"`
 }
 
-func (usuario *Usuarios) Preparar() error {
-	if erro := usuario.validar(); erro != nil {
-		return erro 
+func (usuario *Usuarios) Preparar(etapa string) error {
+	if erro := usuario.validar(etapa); erro != nil {
+		return erro
 	}
+
 	usuario.formatar()
 	return nil
 }
 
-func (usuario *Usuarios) validar() error {
+func (usuario *Usuarios) validar(etapa string) error {
 	if usuario.Nome == "" {
 		return errors.New("O campo nome é obrigatório e não pode ficar em branco!")
 	}
@@ -35,7 +36,7 @@ func (usuario *Usuarios) validar() error {
 		return errors.New("O campo email é obrigatório e não pode ficar em branco!")
 	}
 
-	if usuario.Senha == "" {
+	if etapa == "cadastro" && usuario.Senha == "" {
 		return errors.New("O campo senha é obrigatório e não pode ficar em branco!")
 	}
 
