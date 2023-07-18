@@ -36,6 +36,18 @@ func (repositorio Usuarios) Criar(usuario modelos.Usuarios) (uint64, error) {
 	return uint64(ultimoIdInserido), nil
 }
 
-func (repositorio Usuarios) Atualizar(usuarioId uint64, usuario modelos.Usuarios) error {
+func (repositorio Usuarios) Atualizar(Id uint64, usuario modelos.Usuarios) error {
+	statement, erro := repositorio.db.Prepare(
+		"update usuarios set nome = ?, nick = ?, email = ? where id = ?",
+	)
+	if erro != nil {
+		return  erro 
+	}
+	defer statement.Close()
+
+	if _, erro = statement.Exec(usuario.Nome, usuario.Nick, usuario.Email, Id); erro != nil {
+		return erro 
+	}
 	
+	return nil 
 }
