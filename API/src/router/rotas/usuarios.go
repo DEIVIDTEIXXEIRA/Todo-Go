@@ -14,6 +14,12 @@ var rotasDeUsuarios = []Rota{
 	},
 	{
 		Uri:                   "/usuarios/{usuarioId}",
+		Metodo:                http.MethodGet,
+		Funcao:                controllers.PerfilDoUsuario,
+		RequerAutententicacao: false,
+	},
+	{
+		Uri:                   "/usuarios/{usuarioId}",
 		Metodo:                http.MethodPut,
 		Funcao:                controllers.EditarUsuario,
 		RequerAutententicacao: false,
