@@ -42,7 +42,7 @@ func (repositorio Usuarios) BuscarPorId(usuarioId uint64) (modelos.Usuarios, err
 		usuarioId,
 	)
 	if erro != nil {
-		return modelos.Usuarios{}, erro 
+		return modelos.Usuarios{}, erro
 	}
 	defer linhas.Close()
 
@@ -55,11 +55,11 @@ func (repositorio Usuarios) BuscarPorId(usuarioId uint64) (modelos.Usuarios, err
 			&usuario.Nick,
 			&usuario.Email,
 		); erro != nil {
-			return modelos.Usuarios{}, erro 
+			return modelos.Usuarios{}, erro
 		}
 	}
 
-	return usuario, nil 
+	return usuario, nil
 
 }
 
@@ -68,15 +68,15 @@ func (repositorio Usuarios) Atualizar(Id uint64, usuario modelos.Usuarios) error
 		"update usuarios set nome = ?, nick = ?, email = ? where id = ?",
 	)
 	if erro != nil {
-		return  erro 
+		return erro
 	}
 	defer statement.Close()
 
 	if _, erro = statement.Exec(usuario.Nome, usuario.Nick, usuario.Email, Id); erro != nil {
-		return erro 
+		return erro
 	}
-	
-	return nil 
+
+	return nil
 }
 
 func (repositorio Usuarios) Deletar(usuarioId uint64) error {
@@ -84,7 +84,7 @@ func (repositorio Usuarios) Deletar(usuarioId uint64) error {
 		"delete from usuarios where id = ?",
 	)
 	if erro != nil {
-		return  erro 
+		return erro
 	}
 	defer statement.Close()
 
@@ -93,4 +93,25 @@ func (repositorio Usuarios) Deletar(usuarioId uint64) error {
 	}
 
 	return nil
+}
+
+func (repositorio Usuarios) BuscarPorEmail(email string) (modelos.Usuarios, error) {
+	linhas, erro := repositorio.db.Query(
+		"select id, senha from usuarios where email = ?",
+		email,
+	)
+	if erro != nil {
+		return modelos.Usuarios{}, erro
+	}
+	defer linhas.Close()
+
+	var usuario modelos.Usuarios
+
+	if linhas.Next() {
+		if erro = linhas.Scan(&usuario.Id, &usuario.Senha); erro != nil {
+			return modelos.Usuarios{}, erro
+		}
+	}
+
+	return usuario, nil
 }
