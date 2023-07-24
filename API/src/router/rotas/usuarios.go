@@ -22,7 +22,7 @@ var rotasDeUsuarios = []Rota{
 		Uri:                   "/usuarios/{usuarioId}",
 		Metodo:                http.MethodPut,
 		Funcao:                controllers.EditarUsuario,
-		RequerAutententicacao: false,
+		RequerAutententicacao: true,
 	},
 	{
 		Uri:                   "/usuarios/{usuarioId}",
