@@ -15,13 +15,13 @@ CREATE TABLE usuarios (
 
 CREATE TABLE tarefas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    titulo VARCHAR(50) NOT NULL, 
-    conteudo VARCHAR(300) NOT NULL,
+    tarefa VARCHAR(100) NOT NULL, 
+    observacao VARCHAR(300),
 
     autor_id INT NOT NULL,
     FOREIGN KEY (autor_id)
     REFERENCES usuarios(id)
     ON DELETE CASCADE, 
 
-    prazo TIMESTAMP NOT NULL
+    prazo VARCHAR(50) NOT NULL
 ) ENGINE=InnoDB;

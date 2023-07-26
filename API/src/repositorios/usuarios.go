@@ -141,10 +141,10 @@ func (repositorio Usuarios) AtualizarSenha(usuarioId uint64, senhaComHash string
 		return erro
 	}
 	defer statement.Close()
-	
+
 	if _, erro := statement.Exec(senhaComHash, usuarioId); erro != nil {
-		return erro 
+		return erro
 	}
 
-	return nil 
+	return nil
 }
