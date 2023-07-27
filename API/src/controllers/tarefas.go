@@ -33,7 +33,12 @@ func CriarTarefa(w http.ResponseWriter, r *http.Request) {
 
 	tarefa.AutorId = usuarioId
 
-	layout := "2006-01-02"
+	if erro = tarefa.Preparar(); erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	layout := "02-01-2006"
 	tarefaPrazo, erro := time.Parse(layout, tarefa.Prazo)
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
