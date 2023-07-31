@@ -70,7 +70,7 @@ func CriarTarefa(w http.ResponseWriter, r *http.Request) {
 }
 
 func BuscarTarefas(w http.ResponseWriter, r *http.Request) {
-
+	fmt.Println("buscando")
 }
 
 func EditarTarefa(w http.ResponseWriter, r *http.Request) {
