@@ -66,7 +66,7 @@ func CriarTarefa(w http.ResponseWriter, r *http.Request) {
 }
 
 func BuscarTarefas(w http.ResponseWriter, r *http.Request) {
-
+	fmt.Println("buscando")
 }
 
 func BuscarTarefa(w http.ResponseWriter, r *http.Request) {
