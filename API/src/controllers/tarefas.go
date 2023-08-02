@@ -95,8 +95,41 @@ func BuscarTarefa(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func BuscarTarefas(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("buscando")
+func BuscarTarefasDoUsuario(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	usuarioId, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeTarefas(db)
+	tarefas, erro := repositorio.BuscarPorUsuario(usuarioId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	usuarioIDNoToken, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusUnauthorized, erro)
+		return
+	}
+
+	if usuarioId != usuarioIDNoToken {
+		respostas.Erro(w, http.StatusForbidden, errors.New("Não é possível buscar tarefas que não seja do seu usuario"))
+		return
+	}
+
+	respostas.JSON(w, http.StatusOK, tarefas)
+
 }
 
 func EditarTarefa(w http.ResponseWriter, r *http.Request) {
@@ -181,7 +214,7 @@ func DeletarTarefa(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	repositorio := repositorios.NovoRepositorioDeTarefas(db)
-	tarefaSalvaNoBanco, erro := repositorio.BuscarTarefas(tarefaId)
+	tarefaSalvaNoBanco, erro := repositorio.BuscarTarefa(tarefaId)
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 		return
