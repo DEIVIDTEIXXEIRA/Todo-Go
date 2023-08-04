@@ -9,7 +9,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 func CriarEquipes(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +71,30 @@ func BuscarEquipes(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusOK, equipes)
 }
 
-func BuscarEquipe(w http.ResponseWriter, r *http.Request) {}
+func BuscarEquipe(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	equipe, erro := repositorio.BuscarPorId(equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	respostas.JSON(w, http.StatusOK, equipe)
+}
 
 func AtualizarEquipe(w http.ResponseWriter, r *http.Request) {}
 
