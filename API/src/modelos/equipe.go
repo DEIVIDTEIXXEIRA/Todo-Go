@@ -1,7 +1,6 @@
-package equipe
+package modelos
 
 import (
-	"api/src/modelos"
 	"errors"
 	"strings"
 )
@@ -11,8 +10,6 @@ type Equipes struct {
 	Nome          string             `json:"nome,omitempty"`
 	Descricao     string             `json:"descricao,omitempty"`
 	AutorId       uint64             `json:"autorId,omitempty"`
-	Participantes []modelos.Usuarios `json:"participantes,omitempty"`
-	Tarefas       []modelos.Tarefas  `json:"tarefas,omitempty"`
 }
 
 func (equipe *Equipes) Preparar() error {
