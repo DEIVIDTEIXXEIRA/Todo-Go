@@ -42,4 +42,10 @@ var RotaDeEquipes = []Rota{
 		Funcao:                controllers.CriarTarefaDeEquipe,
 		RequerAutententicacao: true,
 	},
+	{
+		Uri:                   "/equipes/{equipeId}/tarefas",
+		Metodo:                http.MethodGet,
+		Funcao:                controllers.BuscarTarefasDaEquipe,
+		RequerAutententicacao: true,
+	},
 }

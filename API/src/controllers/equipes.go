@@ -248,3 +248,28 @@ func CriarTarefaDeEquipe(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusCreated, tarefa)
 
 }
+
+func BuscarTarefasDaEquipe(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	tarefas, erro := repositorio.BuscarTarefasDaEquipe(equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusForbidden, erro)
+		return
+	}
+
+	respostas.JSON(w, http.StatusOK, tarefas)
+}
