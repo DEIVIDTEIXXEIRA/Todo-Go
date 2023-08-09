@@ -224,3 +224,19 @@ func (repositorio Equipe) DeletarTarefaDaEquipe(equipeId, tarefaId uint64) error
 
 	return nil 
 }
+
+func (repositorio Equipe) Adicionar(equipeId, usuarioId uint64) error {
+    statement, erro := repositorio.db.Prepare(
+        "insert into usuarios_equipe (equipes_id, usuario_id) value(?, ?)",
+    )
+    if erro != nil {
+        return erro 
+    }
+    defer statement.Close()
+
+    if _, erro = statement.Exec(equipeId, usuarioId); erro != nil {
+        return erro 
+    }
+
+    return nil 
+}
