@@ -37,10 +37,7 @@ func (repositorio Tarefas) CriarTarefa(tarefa modelos.Tarefas) (uint64, error) {
 }
 
 func (repositorio Tarefas) BuscarTarefa(tarefaId uint64) (modelos.Tarefas, error) {
-	linha, erro := repositorio.db.Query(`
-    select t.*, u.nick from
-    tarefas t inner join usuarios u
-    on u.id = t.autor_id where t.id = ?`,
+	linha, erro := repositorio.db.Query("select id, autor_id, tarefa, observacao, prazo from tarefas where id = ?",
 		tarefaId,
 	)
 	if erro != nil {
@@ -53,11 +50,10 @@ func (repositorio Tarefas) BuscarTarefa(tarefaId uint64) (modelos.Tarefas, error
 	if linha.Next() {
 		if erro = linha.Scan(
 			&tarefa.Id,
+			&tarefa.AutorId,
 			&tarefa.Tarefa,
 			&tarefa.Obsevacao,
-			&tarefa.AutorId,
-			&tarefa.AutorNick,
-			&tarefa.Prazo,
+			&tarefa.Prazo,			
 		); erro != nil {
 			return modelos.Tarefas{}, erro
 		}
@@ -89,8 +85,8 @@ func (repositorio Tarefas) BuscarPorUsuario(usuarioId uint64) ([]modelos.Tarefas
 			&tarefa.Tarefa,
 			&tarefa.Obsevacao,
 			&tarefa.AutorId,
-			&tarefa.AutorNick,
 			&tarefa.Prazo,
+			&tarefa.AutorNick,			
 		); erro != nil {
 			return nil, erro
 		}
