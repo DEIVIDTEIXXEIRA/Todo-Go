@@ -78,4 +78,22 @@ var RotaDeEquipes = []Rota{
         Funcao:                controllers.RemoverUsuario,
         RequerAutententicacao: true,
     },
+	{
+        Uri:                   "/equipes/{equipeId}/usuarios",
+        Metodo:                http.MethodGet,
+        Funcao:                controllers.RemoverUsuario,
+        RequerAutententicacao: true,
+    },
+	{
+        Uri:                   "/equipes/{equipeId}/usuario/{usuarioId}",
+        Metodo:                http.MethodGet,
+        Funcao:                controllers.BuscarUsuarioDaEquipe,
+        RequerAutententicacao: true,
+    },
+    {
+        Uri:                   "/equipes/{equipeId}/usuarios",
+        Metodo:                http.MethodGet,
+        Funcao:                controllers.BuscarUsuariosDaEquipe,
+        RequerAutententicacao: true,
+    },
 }

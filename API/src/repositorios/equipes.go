@@ -264,3 +264,53 @@ func (repositorio Equipe) Remover(equipeId, usuarioId uint64) error {
 
     return nil
 }
+
+func (repositorio Equipe) BuscarParticipante(equipeId, usuarioId uint64) (modelos.Equipes, modelos.Usuarios, error) {
+    linha, erro := repositorio.db.Query("select equipes_id, usuario_id, usuario_nick from usuarios_equipe where equipes_id = ? and usuario_id = ?",
+        equipeId, usuarioId,
+    )
+    if erro != nil {
+        return modelos.Equipes{}, modelos.Usuarios{}, erro
+    }
+    defer linha.Close()
+
+    var Equipe modelos.Equipes
+    var Usuario modelos.Usuarios
+
+    if linha.Next() {
+        if erro = linha.Scan(
+            &Equipe.Id,
+            &Usuario.Id,
+            &Usuario.Nick,
+        ); erro != nil {
+            return modelos.Equipes{}, modelos.Usuarios{}, erro
+        }
+    }
+
+    return Equipe, Usuario, nil
+}
+
+func (repositorio Equipe) BuscarParticipantesDaEquipe(equipeId uint64) ([]modelos.Usuarios, error) {
+    linhas, erro := repositorio.db.Query("select usuario_id, usuario_nick from usuarios_equipe where equipes_id = ?", equipeId)
+    if erro != nil {
+        return nil, erro
+    }
+    defer linhas.Close()
+
+    var usuarios []modelos.Usuarios
+
+    for linhas.Next() {
+        var usuario modelos.Usuarios
+
+        if erro = linhas.Scan(
+            &usuario.Id,
+            &usuario.Nick,
+        ); erro != nil {
+            return nil, erro 
+        }
+
+        usuarios = append(usuarios, usuario)
+    }
+
+    return usuarios, nil 
+}
