@@ -15,10 +15,16 @@ function criarUsuario(evento) {
         method: "POST",
         data: {
             nome: $('#nome').val(),
-            email: $('#email').val(),
             nick: $('#nick').val(),
+            email: $('#email').val(),
             senha: $('#senha').val()
-        },
+        }
+    }).done(function() {
+        alert("Usuario cadastrado");
+    }).fail(function(erro) {
+        console.log(erro);
+        alert("Usuario não cadastrado");
     });
+
 }
    

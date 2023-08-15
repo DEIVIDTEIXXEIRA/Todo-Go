@@ -7,9 +7,15 @@ import (
 
 var RotasUsuarios = []Rota{
 	{
-		Uri:    "/criar-usuario",
-		Metodo: http.MethodGet,
-		Funcao: controllers.CarregarPaginaDeCadastroDeusuario,
+		Uri:                "/criar-usuario",
+		Metodo:             http.MethodGet,
+		Funcao:             controllers.CarregarPaginaDeCadastroDeusuario,
+		RequerAutenticacao: false,
+	},
+	{
+		Uri:                "/usuarios",
+		Metodo:             http.MethodPost,
+		Funcao:             controllers.CriarUsuario,
 		RequerAutenticacao: false,
 	},
 }
