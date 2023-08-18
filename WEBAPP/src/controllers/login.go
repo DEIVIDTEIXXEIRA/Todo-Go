@@ -1,5 +1,36 @@
 package controllers
 
-import "net/http"
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"webapp/src/respostas"
+)
 
-func FazerLogin(w http.ResponseWriter, r *http.Request)
+func FazerLogin(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	usuario, erro := json.Marshal(map[string]string{
+		"email": r.FormValue("email"),
+		"senha": r.FormValue("senha"),
+	})
+
+	if erro != nil {
+		respostas.JSON(w, http.StatusBadRequest, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+
+	response, erro := http.Post("http://localhost:8080/login", "application/json", bytes.NewBuffer(usuario))
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	token, _ := ioutil.ReadAll(response.Body)
+	fmt.Println(response.StatusCode, string(token))
+	
+
+}
