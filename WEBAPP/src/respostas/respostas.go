@@ -22,5 +22,5 @@ func JSON(w http.ResponseWriter, statusCode int, dados interface{}) {
 func TratarStatusCodeDeErro(w http.ResponseWriter, r *http.Response) {
 	var erro Erro
 	json.NewDecoder(r.Body).Decode(&erro)
-	JSON(w, r.StatusCode, erro )
+	JSON(w, r.StatusCode, erro)
 }
