@@ -13,7 +13,7 @@ import (
 func main() {
 	config.Carregar()
 	cookies.Configurar()
-	utils.CarregarTemplate()
+	utils.CarregarTemplates()
 
 	fmt.Printf("rodando Webapp %d\n", config.Porta)
 
