@@ -14,4 +14,5 @@ func CarregarTemplates() {
 
 func ExecutarTemplete(w http.ResponseWriter, template string, dados interface{}) {
 	templates.ExecuteTemplate(w, template, dados)
+	
 }

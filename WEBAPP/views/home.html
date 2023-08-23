@@ -32,8 +32,10 @@
     
                     <div class="form-group">
                         <label for="prazo">Prazo</label>
-                        <input type="date" class="form-control" id="prazo" name="prazo" required="required">
+                        <input type="text" class="form-control" id="prazo" name="prazo" required="required"
+                               placeholder="dd-mm-aaaa">
                     </div>
+                    
     
                     <button class="btn btn-danger" type="submit">
                         Publicar
@@ -61,5 +63,6 @@
     {{ template "rodape" }}
     {{ template "script" }}
 
+    <script src="/assets/js/tarefas.js"></script>
 </body>
 </html>
