@@ -1,4 +1,5 @@
 $('#nova-tarefa').on("submit", criarTarefa);
+$('.concluir-tarefa').on("click", concluirTarefa);
 
 function criarTarefa(evento) {
     evento.preventDefault(); 
@@ -17,3 +18,23 @@ function criarTarefa(evento) {
         alert("erro ao criar tarefa!!");
     })
 }
+
+function concluirTarefa(evento) {
+    evento.preventDefault(); 
+   
+    const elementoClicado = $(evento.target);
+    const tarefa = elementoClicado.closest('div');
+    const tarefaId = tarefa.data('tarefa-id');
+
+    elementoClicado.prop('disabled', true);
+
+    $.ajax({
+        url: `/tarefas/${tarefaId}`,
+        method: "DELETE"
+    });
+    
+    tarefa.fadeOut("slow", function() {
+        $(this).remove();
+    });
+    
+} 
