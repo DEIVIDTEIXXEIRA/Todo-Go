@@ -24,4 +24,10 @@ var RotaDeTarefas = []Rota{
 		Funcao:             controllers.CarregarPaginaDeEdicaoDeTarefa,
 		RequerAutenticacao: true,
 	},
+	{
+		Uri:                "/tarefas/{tarefaId}",
+		Metodo:             http.MethodPut,
+		Funcao:             controllers.EditarTarefa,
+		RequerAutenticacao: true,
+	},
 }
