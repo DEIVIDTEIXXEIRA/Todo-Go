@@ -1,5 +1,6 @@
 $('#nova-tarefa').on("submit", criarTarefa);
 $('.concluir-tarefa').on("click", concluirTarefa);
+$('.deletar-tarefa').on("click", deletarTarefa);
 
 function criarTarefa(evento) {
     evento.preventDefault(); 
@@ -33,8 +34,28 @@ function concluirTarefa(evento) {
         method: "DELETE"
     });
     
+    
     tarefa.fadeOut("slow", function() {
         $(this).remove();
     });
     
 } 
+
+function deletarTarefa(evento) {
+    evento.preventDefault(); 
+   
+    const elementoClicado = $(evento.target);
+    const tarefa = elementoClicado.closest('div');
+    const tarefaId = tarefa.data('tarefa-id');
+
+    $.ajax({
+        url: `/tarefas/${tarefaId}`,
+        method: "DELETE"
+    }).done(function() {
+        tarefa.fadeOut("slow", function() {
+            $(this).remove();
+        });    
+    }).fail(function() {
+        alert("Erro");
+    })
+}

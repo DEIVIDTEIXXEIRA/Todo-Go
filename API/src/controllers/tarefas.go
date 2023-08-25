@@ -218,5 +218,5 @@ func DeletarTarefa(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respostas.JSON(w, http.StatusNoContent, nil)
+	respostas.JSON(w, http.StatusOK, nil)
 }
