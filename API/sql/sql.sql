@@ -11,26 +11,22 @@ CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
     nick VARCHAR(50) NOT NULL UNIQUE,
-    prazo VARCHAR(50) NOT NULL 
+    email VARCHAR(50) NOT NULL UNIQUE,
+    senha VARCHAR(100) NOT NULL
 ) ENGINE=InnoDB;
+
 
 CREATE TABLE tarefas (
-    id int AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     tarefa VARCHAR(100) NOT NULL,
     observacao VARCHAR(100) NOT NULL,
-    prazo VARCHAR(50) NOT NULL
-
+    prazo VARCHAR(50) NOT NULL,
     autor_id INT NOT NULL,
-    FOREIGN KEY (autor_id)
-    REFERENCES usuarios(id)
-    ON DELETE CASCADE, 
-
+    FOREIGN KEY (autor_id) REFERENCES usuarios(id) ON DELETE CASCADE, 
     autor_nick VARCHAR(50) NOT NULL,
-    FOREIGN KEY (autor_nick)
-    REFERENCES usuarios(nick)
-    ON DELETE CASCADE
-
+    FOREIGN KEY (autor_nick) REFERENCES usuarios(nick) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
 
 CREATE TABLE equipes (
     id INT AUTO_INCREMENT PRIMARY KEY, 
@@ -43,16 +39,17 @@ CREATE TABLE equipes (
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-CREATE TABLE tarefas (
+CREATE TABLE tarefas_equipe (
     id INT AUTO_INCREMENT PRIMARY KEY,
     tarefa VARCHAR(100) NOT NULL,
     observacao VARCHAR(100) NOT NULL,
     prazo VARCHAR(50) NOT NULL,
     autor_id INT NOT NULL,
-    autor_nick VARCHAR(50) NOT NULL,
+    equipes_id INT NOT NULL,
     FOREIGN KEY (autor_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    FOREIGN KEY (autor_nick) REFERENCES usuarios(nick) ON DELETE CASCADE
+    FOREIGN KEY (equipes_id) REFERENCES equipes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
 
 
 

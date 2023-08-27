@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"webapp/src/config"
+	"webapp/src/cookies"
 	"webapp/src/modelos"
 	"webapp/src/requisicoes"
 	"webapp/src/respostas"
@@ -15,6 +16,11 @@ import (
 )
 
 func CarregarTelaDeLogin(w http.ResponseWriter, r *http.Request) {
+	cookie, _ := cookies.Ler(r)
+	if cookie["token"] != "" {
+		http.Redirect(w, r, "/home", 302)
+		return
+	}
 	utils.ExecutarTemplete(w, "login.html", nil)
 }
 
@@ -45,8 +51,8 @@ func CarregarPaginaPrincipal(w http.ResponseWriter, r *http.Request) {
 	utils.ExecutarTemplete(w, "home.html", Tarefas)
 }
 
-func CarregarPaginaDeEdicaoDeTarefa(w http.ResponseWriter, r* http.Request) {
-	parametros:= mux.Vars(r)
+func CarregarPaginaDeEdicaoDeTarefa(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
 	tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
 	if erro != nil {
 		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: erro.Error()})
@@ -74,4 +80,14 @@ func CarregarPaginaDeEdicaoDeTarefa(w http.ResponseWriter, r* http.Request) {
 	}
 
 	utils.ExecutarTemplete(w, "editar-tarefa.html", tarefa)
+}
+
+func CarregarPerfilDoUsuario(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	usuarioId, _ := strconv.ParseUint(parametros["usuarioId"], 10, 64)
+	
+
+	usuario, erro := modelos.BuscarUsuarioCompleto(usuarioId, r)
+	fmt.Println(usuario, erro)
+	
 }
