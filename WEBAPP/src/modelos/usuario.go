@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"webapp/src/config"
 	"webapp/src/requisicoes"
@@ -29,42 +28,39 @@ func BuscarUsuarioCompleto(usuarioId uint64, r *http.Request) (Usuario, error) {
 	go BuscaEquipesDoUsuario(canalEquipes, usuarioId, r)
 
 	var (
-		usuario Usuario
-		tarefas []Tarefas
-		equipes []Equipes
+		usuarioCompleto Usuario
+		tarefas         []Tarefas
+		equipes         []Equipes
 	)
 
-	for i := 0; i <= 3; i++ {
+	for i := 0; i < 3; i++ {
 		select {
 		case usuarioCarregado := <-canalUsuario:
 			if usuarioCarregado.Id == 0 {
 				return Usuario{}, errors.New("Erro ao buscar usuário")
 			}
-			usuario = usuarioCarregado
-			log.Println("Dados do usuário carregados")
+			usuarioCompleto = usuarioCarregado
 
 		case tarefasCarregadas := <-canalTarefas:
 			if tarefasCarregadas == nil {
 				return Usuario{}, errors.New("Erro ao buscar tarefas")
 			}
 			tarefas = tarefasCarregadas
-			log.Println("Tarefas do usuário carregadas")
 
 		case equipesCarregadas := <-canalEquipes:
 			if equipesCarregadas == nil {
 				return Usuario{}, errors.New("Erro ao buscar equipes")
 			}
 			equipes = equipesCarregadas
-			log.Println("Equipes do usuário carregadas")
+
 		}
+
 	}
-	fmt.Println(usuario, "1")
 
-	usuario.Tarefas = tarefas
-	usuario.Equipes = equipes
+	usuarioCompleto.Tarefas = tarefas
+	usuarioCompleto.Equipes = equipes
 
-	fmt.Println(usuario, "2")
-	return usuario, nil
+	return usuarioCompleto, nil
 }
 
 func BuscaDadosUsuario(canal chan<- Usuario, usuarioId uint64, r *http.Request) {

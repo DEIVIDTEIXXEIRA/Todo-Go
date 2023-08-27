@@ -584,11 +584,6 @@ func BuscarUsuarioDaEquipe(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    if equipe == (modelos.Equipes{}) || participante == (modelos.Usuarios{}) {
-        respostas.Erro(w, http.StatusBadRequest, errors.New("Equipe ou usuário não encontrado!!"))
-        return
-    }
-
 
 
     respostas.JSON(w, http.StatusOK, equipe)

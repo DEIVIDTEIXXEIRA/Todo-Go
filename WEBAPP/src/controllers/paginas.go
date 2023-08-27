@@ -84,10 +84,13 @@ func CarregarPaginaDeEdicaoDeTarefa(w http.ResponseWriter, r *http.Request) {
 
 func CarregarPerfilDoUsuario(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
-	usuarioId, _ := strconv.ParseUint(parametros["usuarioId"], 10, 64)
-	
+	usuarioId, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: erro.Error()})
+		return
+	}
 
 	usuario, erro := modelos.BuscarUsuarioCompleto(usuarioId, r)
 	fmt.Println(usuario, erro)
-	
+
 }
