@@ -3,8 +3,8 @@
 <div class="jumbotron" data-tarefa-id="{{ .Id }}" style="padding: 10px;">
     <h2 class="display-5"> {{ .Tarefa }} </h2>
     <p class="lead" style="font-size: 14px;"> {{ .Obsevacao }} </p>
-    <p class="style="font-size: 14px;> {{ .Prazo }} - {{ .AutorNick }} </p>
-    <a href="/usuarios/{{ .AutorId }}"> {{ .AutorNick }} </a>
+    <a href="/usuarios/{{ .AutorId }}"> {{ .AutorNick }} </a> 
+    <p class="style="font-size: 14px;> {{ .Prazo }}  </p>
     {{ template "check" . }}
     {{ template "editar" . }}
     {{ template "deletar" . }}
