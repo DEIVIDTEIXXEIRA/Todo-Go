@@ -19,49 +19,54 @@ type Usuario struct {
 }
 
 func BuscarUsuarioCompleto(usuarioId uint64, r *http.Request) (Usuario, error) {
-	canalUsuario := make(chan Usuario)
-	canalTarefas := make(chan []Tarefas)
-	canalEquipes := make(chan []Equipes)
+    canalUsuario := make(chan Usuario)
+    canalTarefas := make(chan []Tarefas)
+    canalEquipes := make(chan []Equipes)
 
-	go BuscaDadosUsuario(canalUsuario, usuarioId, r)
-	go BuscaTarefasDoUsuaro(canalTarefas, usuarioId, r)
-	go BuscaEquipesDoUsuario(canalEquipes, usuarioId, r)
+    go BuscaDadosUsuario(canalUsuario, usuarioId, r)
+    go BuscaTarefasDoUsuaro(canalTarefas, usuarioId, r)
+    go BuscaEquipesDoUsuario(canalEquipes, usuarioId, r)
 
-	var (
-		usuarioCompleto Usuario
-		tarefas         []Tarefas
-		equipes         []Equipes
-	)
+    var (
+        usuarioCompleto Usuario
+        tarefas         []Tarefas
+        equipes         []Equipes
+        usuarioErro     error
+    )
 
-	for i := 0; i < 3; i++ {
-		select {
-		case usuarioCarregado := <-canalUsuario:
-			if usuarioCarregado.Id == 0 {
-				return Usuario{}, errors.New("Erro ao buscar usuário")
-			}
-			usuarioCompleto = usuarioCarregado
+    for i := 0; i < 3; i++ {
+        select {
+        case usuarioCarregado := <-canalUsuario:
+            if usuarioCarregado.Id == 0 {
+                usuarioErro = errors.New("Erro ao buscar usuário")
+            }
+            usuarioCompleto = usuarioCarregado
 
-		case tarefasCarregadas := <-canalTarefas:
-			if tarefasCarregadas == nil {
-				return Usuario{}, errors.New("Erro ao buscar tarefas")
-			}
-			tarefas = tarefasCarregadas
+        case tarefasCarregadas := <-canalTarefas:
+            if tarefasCarregadas == nil {
+                return Usuario{}, errors.New("Erro ao buscar tarefas")
+            }
+            tarefas = tarefasCarregadas
 
-		case equipesCarregadas := <-canalEquipes:
-			if equipesCarregadas == nil {
-				return Usuario{}, errors.New("Erro ao buscar equipes")
-			}
-			equipes = equipesCarregadas
+        case equipesCarregadas := <-canalEquipes:
+            if equipesCarregadas == nil {
+                equipes = []Equipes{}
+            } else {
+                equipes = equipesCarregadas
+            }
+        }
+    }
 
-		}
+    if usuarioErro != nil {
+        return Usuario{}, usuarioErro
+    }
 
-	}
+    usuarioCompleto.Tarefas = tarefas
+    usuarioCompleto.Equipes = equipes
 
-	usuarioCompleto.Tarefas = tarefas
-	usuarioCompleto.Equipes = equipes
-
-	return usuarioCompleto, nil
+    return usuarioCompleto, nil
 }
+
 
 func BuscaDadosUsuario(canal chan<- Usuario, usuarioId uint64, r *http.Request) {
 	url := fmt.Sprintf("%s/usuarios/%d", config.APIURL, usuarioId)

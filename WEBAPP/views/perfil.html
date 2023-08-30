@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo-List - {{ .Usuario.Nome }} </title>
+    <title>Todo-List - {{ .Nome }} </title>
     <link href="/assets/css/bootstrap.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
@@ -16,20 +16,29 @@
                     <div class="card-body">
                         <h5 class="card-title">Meu Perfil</h5>
                         <h6 class="card-subtitle mb-2 text-muted">
-                            {{ .Usuario.Nome }}  
+                            {{ .Nome }}  
                         </h6>
 
                         <p class="card-text">
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#modal-seguidores">
-                                Tarefas: {{ len .Usuario.Tarefas }}
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#modal-tarefas">
+                                Tarefas: {{ len .Tarefas }}
+                            </a>
+                    -
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#modal-equipes">
+                                Equipes: {{ len .Equipes }}
                             </a>
                         </p>
 
-                        <p class="card-text">
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#modal-seguidores">
-                                Equipes: {{ len .Usuario.Equipes }}
-                            </a>
-                        </p>
+                        <div class="row">
+                            <div class="col-12">
+                                <a href="/editar-usuario" class="card-link"><button class="btn btn-info">Editar Usuário</button>
+                                </a>
+
+                                <a href="/atualizar-senha" class="card-link">
+                                    <button class="btn btn-info">Atualizar Senha</button>
+                                </a>
+                            </div>
+                        </div>
 
                     </div>
                 </div>
@@ -45,7 +54,7 @@
                         <h5 class="card-title">Minhas Tarefas</h5>
                     </div>
                     <p class="card-text"> 
-                        {{ range .Usuario.Tarefas }} 
+                        {{ range .Tarefas }} 
                             {{ template "tarefa" . }}
                         {{ else }}
                             <p class="text-muted text-center">
@@ -56,20 +65,29 @@
                 </div>
             </div>
         </div>
-    
+
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
                     <div style="text-align: center;">
                         <h5 class="card-title">Minhas Equipes</h5>
                     </div>
-                    <p class="card-text"> 
-                        {{ range .Usuario.Equipes }} 
-                         {{ .Nome }}
-                    
+                    <div class="team-list">
+                        {{ range .Equipes }} 
+                        <div class="jumbotron" data-tarefa-id="{{ .Id }}" style="padding: 10px;">
+                            <h2 class="display-5">
+                                <a href="/equipes/{{ .Id }}" style="text-decoration: none; color: inherit;">
+                                    {{ .Nome }}
+                                </a>
+                            </h2>
+                            <p class="lead" style="font-size: 14px;"> {{ .Descricao }} </p>
+                            <a href="/equipes/{{ .Id }}/editar" style="text-decoration: none;">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            <i class="fas fa-trash text-danger deletar-tarefa" style="cursor: pointer;"></i>
+                        </div>
                         {{ end }}
-                        
-                    </p>
+                    </div>
                 </div>
             </div>
         </div>

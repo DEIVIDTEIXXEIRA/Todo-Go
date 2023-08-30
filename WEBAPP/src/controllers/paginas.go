@@ -83,14 +83,8 @@ func CarregarPaginaDeEdicaoDeTarefa(w http.ResponseWriter, r *http.Request) {
 }
 
 func CarregarPerfilDoUsuario(w http.ResponseWriter, r *http.Request) {
-	parametros := mux.Vars(r)
-	usuarioId, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
-	if erro != nil {
-		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: erro.Error()})
-		return
-	}
-
-	
+	cookie, _ := cookies.Ler(r)
+	usuarioId, _ := strconv.ParseUint(cookie["id"], 10, 64)
 
 	usuario, erro := modelos.BuscarUsuarioCompleto(usuarioId, r)
 	if erro != nil {
@@ -98,15 +92,5 @@ func CarregarPerfilDoUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie, _ := cookies.Ler(r)
-	usuarioLogado, _ := strconv.ParseUint(cookie["Id"], 10, 64)
-
-
-	utils.ExecutarTemplete(w, "perfil.html", struct{
-		Usuario modelos.Usuario
-		UsuarioLogadoId uint64
-	}{
-		Usuario: usuario,
-		UsuarioLogadoId: usuarioLogado,
-	})
+	utils.ExecutarTemplete(w, "perfil.html", usuario)
 }
