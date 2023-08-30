@@ -109,7 +109,7 @@ func EditarUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro = usuario.Preparar("edição"); erro != nil {
+	if erro = usuario.Preparar("edicao"); erro != nil {
 		respostas.Erro(w, http.StatusBadRequest, erro)
 		return
 	}

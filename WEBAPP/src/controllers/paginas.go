@@ -94,3 +94,22 @@ func CarregarPerfilDoUsuario(w http.ResponseWriter, r *http.Request) {
 
 	utils.ExecutarTemplete(w, "perfil.html", usuario)
 }
+
+//CarregarPaginaDeEdicaoDoUsuario carrega a página de formulário de edição.
+func CarregarPaginaDeEdicaoDoUsuario(w http.ResponseWriter, r *http.Request) {
+	cookie, _ := cookies.Ler(r)
+	usuarioId, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+	//canal foi criado, pois, já temos uma função que busca as informações do usuario.
+	canal := make(chan modelos.Usuario)
+	go modelos.BuscaDadosUsuario(canal, usuarioId, r) 
+	usuario:= <-canal 
+
+	if usuario.Id == 0 {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro:"Erro ao buscar usuário"})
+		return
+	}
+	
+	utils.ExecutarTemplete(w, "editar-usuario.html", usuario)
+
+}
