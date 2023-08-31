@@ -95,26 +95,46 @@ func CarregarPerfilDoUsuario(w http.ResponseWriter, r *http.Request) {
 	utils.ExecutarTemplete(w, "perfil.html", usuario)
 }
 
-//CarregarPaginaDeEdicaoDoUsuario carrega a página de formulário de edição.
+// CarregarPaginaDeEdicaoDoUsuario carrega a página de formulário de edição.
 func CarregarPaginaDeEdicaoDoUsuario(w http.ResponseWriter, r *http.Request) {
 	cookie, _ := cookies.Ler(r)
 	usuarioId, _ := strconv.ParseUint(cookie["id"], 10, 64)
 
 	//canal foi criado, pois, já temos uma função que busca as informações do usuario.
 	canal := make(chan modelos.Usuario)
-	go modelos.BuscaDadosUsuario(canal, usuarioId, r) 
-	usuario:= <-canal 
+	go modelos.BuscaDadosUsuario(canal, usuarioId, r)
+	usuario := <-canal
 
 	if usuario.Id == 0 {
-		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro:"Erro ao buscar usuário"})
+		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: "Erro ao buscar usuário"})
 		return
 	}
-	
+
 	utils.ExecutarTemplete(w, "editar-usuario.html", usuario)
 
 }
 
 // CarregarPaginaDeEdicaoDoSenha carrega a pagina com formulário para atualizar senha
 func CarregarPaginaDeEdicaoDoSenha(w http.ResponseWriter, r *http.Request) {
-	utils.ExecutarTemplete(w, "editar-senha.html", nil )
+	utils.ExecutarTemplete(w, "editar-senha.html", nil)
 }
+
+// CarregarPaginaDeEquipes carrega a pagina que busca as equipes do usuario.
+func CarregarPaginaDeEquipes(w http.ResponseWriter, r *http.Request) {
+    cookie, _ := cookies.Ler(r)
+    usuarioId, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+    canal := make(chan []modelos.Equipes)
+    go modelos.BuscaEquipesDoUsuario(canal, usuarioId, r)
+    equipesCarregadas := <-canal
+
+    var equipes []modelos.Equipes
+    if equipesCarregadas == nil {
+        equipes = []modelos.Equipes{}
+    } else {
+        equipes = equipesCarregadas
+    }
+
+    utils.ExecutarTemplete(w, "equipes.html", equipes)
+}
+
