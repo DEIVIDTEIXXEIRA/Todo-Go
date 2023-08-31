@@ -138,6 +138,7 @@ func CarregarPaginaDeEquipes(w http.ResponseWriter, r *http.Request) {
     utils.ExecutarTemplete(w, "equipes.html", equipes)
 }
 
+//CarregarPaginaDeEdicaoDeEquipe carrega pagina de editar usuario
 func CarregarPaginaDeEdicaoDeEquipe(w http.ResponseWriter, r *http.Request) {
 	paramentros := mux.Vars(r)
 	equipeId, erro := strconv.ParseUint(paramentros["equipeId"], 10, 64)
@@ -167,4 +168,23 @@ func CarregarPaginaDeEdicaoDeEquipe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ExecutarTemplete(w, "editar-equipe.html", equipe)
+}
+
+// BuscainformacoesDaEquipe busca as informações da equipe
+func BuscainformacoesDaEquipe(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.JSON(w, http.StatusBadRequest, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+
+	equipe, erro := modelos.BuscarEquipeCompleta(equipeId, r)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+
+
+	utils.ExecutarTemplete(w, "perfildaequipe.html", equipe)
 }
