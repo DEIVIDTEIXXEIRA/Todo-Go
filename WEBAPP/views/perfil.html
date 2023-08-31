@@ -27,7 +27,9 @@
                             <a href="#" data-bs-toggle="modal" data-bs-target="#modal-equipes">
                                 Equipes: {{ len .Equipes }}
                             </a>
+
                         </p>
+                        
 
                         <div class="row">
                             <div class="col-12">
@@ -37,6 +39,11 @@
                                 <a href="/editar-senha" class="card-link">
                                     <button class="btn btn-info">Atualizar Senha</button>
                                 </a>
+                                <a id="deletar-usuario" class="card-link">
+                                    <button class="btn btn-info">
+                                        Excluir conta permanentemente
+                                    </button>
+                                </a>                                
                             </div>
                         </div>
 
@@ -92,12 +99,13 @@
             </div>
         </div>
     </div>
-    
+   
 
 {{ template "rodape" }}
 {{ template "script" }}
 
 <script src="/assets/js/tarefas.js"></script>
+<script src="/assets/js/usuario.js"></script>
 </body>
 </html>
     
