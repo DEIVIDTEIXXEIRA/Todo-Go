@@ -5,11 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"webapp/src/config"
 	"webapp/src/requisicoes"
 	"webapp/src/respostas"
+
+	"github.com/gorilla/mux"
 )
 
+// CriarEquipes chama a API para criar uma equipe para o usuário.
 func CriarEquipes(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
@@ -38,3 +42,39 @@ func CriarEquipes(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, response.StatusCode, nil)
 }
 
+// EditarEquipe chama a api para editar uma equipe
+func EditarEquipe(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.JSON(w, http.StatusBadRequest, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+
+	equipe, erro := json.Marshal(map[string]string{
+		"nome":      r.FormValue("nome"),
+		"descricao": r.FormValue("descricao"),
+	})
+	if erro != nil {
+		respostas.JSON(w, http.StatusBadRequest, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/equipes/%d", config.APIURL, equipeId)
+	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodPut, url, bytes.NewBuffer(equipe))
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		respostas.TratarStatusCodeDeErro(w, response)
+		return
+	}
+
+	respostas.JSON(w, response.StatusCode, nil)
+
+}

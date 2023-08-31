@@ -138,3 +138,33 @@ func CarregarPaginaDeEquipes(w http.ResponseWriter, r *http.Request) {
     utils.ExecutarTemplete(w, "equipes.html", equipes)
 }
 
+func CarregarPaginaDeEdicaoDeEquipe(w http.ResponseWriter, r *http.Request) {
+	paramentros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(paramentros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/equipes/%d", config.APIURL, equipeId)
+	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		respostas.TratarStatusCodeDeErro(w, response)
+		return
+	}
+
+	var equipe modelos.Equipes
+	
+	if erro = json.NewDecoder(response.Body).Decode(&equipe); erro != nil {
+		respostas.JSON(w, http.StatusUnprocessableEntity, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+
+	utils.ExecutarTemplete(w, "editar-equipe.html", equipe)
+}

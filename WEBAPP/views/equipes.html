@@ -46,16 +46,14 @@
                 </div>
                 <div class="team-list">
                     {{ range . }} 
-                    <div class="jumbotron" data-tarefa-id="{{ .Id }}" style="padding: 10px;">
+                    <div class="jumbotron" data-equipe-id="{{ .Id }}" style="padding: 10px;">
                         <h2 class="display-5">
                             <a href="/equipes/{{ .Id }}" style="text-decoration: none; color: inherit;">
                                 {{ .Nome }}
                             </a>
                         </h2>
                         <p class="lead" style="font-size: 14px;"> {{ .Descricao }} </p>
-                        <a href="/equipes/{{ .Id }}/editar" style="text-decoration: none;">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </a>
+                        {{ template "editar-equipe" . }}
                         <i class="fas fa-trash text-danger deletar-tarefa" style="cursor: pointer;"></i>
                     </div>
                     {{ end }}
