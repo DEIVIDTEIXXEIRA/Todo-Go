@@ -36,4 +36,16 @@ var RotasUsuarios = []Rota{
 		Funcao:             controllers.EditarUsuario,
 		RequerAutenticacao: true,
 	},
+	{
+		Uri:                "/editar-senha",
+		Metodo:             http.MethodGet,
+		Funcao:             controllers.CarregarPaginaDeEdicaoDoSenha,
+		RequerAutenticacao: true,
+	},
+	{
+		Uri:                "/editar-senha",
+		Metodo:             http.MethodPost,
+		Funcao:             controllers.EditarSenha,
+		RequerAutenticacao: true,
+	},
 }

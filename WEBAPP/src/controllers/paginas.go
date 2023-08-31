@@ -113,3 +113,8 @@ func CarregarPaginaDeEdicaoDoUsuario(w http.ResponseWriter, r *http.Request) {
 	utils.ExecutarTemplete(w, "editar-usuario.html", usuario)
 
 }
+
+// CarregarPaginaDeEdicaoDoSenha carrega a pagina com formulário para atualizar senha
+func CarregarPaginaDeEdicaoDoSenha(w http.ResponseWriter, r *http.Request) {
+	utils.ExecutarTemplete(w, "editar-senha.html", nil )
+}
