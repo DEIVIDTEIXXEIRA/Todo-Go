@@ -89,7 +89,7 @@
                             </h2>
                             <p class="lead" style="font-size: 14px;"> {{ .Descricao }} </p>
                             {{ template "editar-equipe" . }}
-                            <i class="fas fa-trash text-danger deletar-tarefa" style="cursor: pointer;"></i>
+                            {{ template "deletar-equipe" }} 
                         </div>
                         {{ end }}
                     </div>
@@ -104,6 +104,8 @@
 
 <script src="/assets/js/tarefas.js"></script>
 <script src="/assets/js/usuario.js"></script>
+<script src="/assets/js/equipes.js"></script>
+
 </body>
 </html>
     
