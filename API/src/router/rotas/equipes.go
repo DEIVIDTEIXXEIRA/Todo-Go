@@ -70,7 +70,7 @@ var RotaDeEquipes = []Rota{
 		Uri:                   "/equipes/{equipeId}/tarefas/{tarefaId}",
 		Metodo:                http.MethodDelete,
 		Funcao:                controllers.DeletarTarefaDaEquipe,
-		RequerAutententicacao: true,
+		RequerAutententicacao: false,
 	},
 	{
 		Uri:                   "/equipes/{equipeId}/adicionar/{usuarioId}",

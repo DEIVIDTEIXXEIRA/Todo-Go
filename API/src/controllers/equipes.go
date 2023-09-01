@@ -8,6 +8,7 @@ import (
 	"api/src/respostas"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -103,7 +104,7 @@ func BuscarEquipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func BuscarEquipesDoUsuario(w http.ResponseWriter, r *http.Request) {
-    parametros := mux.Vars(r)
+	parametros := mux.Vars(r)
 	usuarioId, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
 	if erro != nil {
 		respostas.Erro(w, http.StatusBadRequest, erro)
@@ -117,7 +118,7 @@ func BuscarEquipesDoUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-    repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
 	equipes, erro := repositorio.BuscarEquipesUsuario(usuarioId)
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
@@ -125,7 +126,6 @@ func BuscarEquipesDoUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respostas.JSON(w, http.StatusOK, equipes)
-
 
 }
 
@@ -301,155 +301,113 @@ func BuscarTarefasDaEquipe(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusOK, tarefas)
 }
 
-func BuscarTarefaDaEquipe(w http.ResponseWriter, r *http.Request)  {
-    parametros := mux.Vars(r)
-    tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+func BuscarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
-    equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
-    db, erro := banco.Conectar()
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
-    defer db.Close()
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
 
-    repositorio := repositorios.NovoRepositorioDeEquipes(db)
-    tarefa, erro := repositorio.BuscarTarefaDaEquipe(tarefaId, equipeId)
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return 
-    }
-    
-    respostas.JSON(w, http.StatusOK, tarefa)
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	tarefa, erro := repositorio.BuscarTarefaDaEquipe(tarefaId, equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	respostas.JSON(w, http.StatusOK, tarefa)
 }
 
 func EditarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
-    usuarioId, erro := autenticacao.ExtrairUsuarioID(r) 
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+	usuarioId, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
-    parametros := mux.Vars(r)
-    tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+	parametros := mux.Vars(r)
+	tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
-    equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
-    db, erro := banco.Conectar()
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
-    defer db.Close()
-
-    repositorio := repositorios.NovoRepositorioDeEquipes(db)
-    TarefaSalvaNoBanco, erro := repositorio.BuscarTarefaDaEquipe(tarefaId, equipeId)
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
-
-    if TarefaSalvaNoBanco.AutorId != usuarioId {
-        respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel atualizar uma tarefa que não tenha sido você quem criou"))
-        return 
-    }
-
-    corpoRequest, erro := ioutil.ReadAll(r.Body)
-    if erro != nil {
-        respostas.Erro(w, http.StatusForbidden, erro)
-        return
-    }
-
-    var Tarefa modelos.Tarefas
-    if erro = json.Unmarshal(corpoRequest, &Tarefa); erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
-
-    if erro = repositorio.EditarTarefaDaEquipe(equipeId, tarefaId, Tarefa); erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
-
-    respostas.JSON(w, http.StatusOK, nil)
-}
-
-func DeletarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
-	usuarioId, erro := autenticacao.ExtrairUsuarioID(r) 
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
-
-    parametros := mux.Vars(r)
-    tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
-
-    equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
-
-    db, erro := banco.Conectar()
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
-    defer db.Close()
-
-    repositorio := repositorios.NovoRepositorioDeEquipes(db)
-    TarefaSalvaNoBanco, erro := repositorio.BuscarTarefaDaEquipe(tarefaId, equipeId)
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
-
-    if TarefaSalvaNoBanco.AutorId != usuarioId {
-        respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel deletar uma tarefa que não tenha sido você quem criou"))
-        return 
-    }
-
-	if erro = repositorio.DeletarTarefaDaEquipe(equipeId, tarefaId); erro != nil {
+	db, erro := banco.Conectar()
+	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	TarefaSalvaNoBanco, erro := repositorio.BuscarTarefaDaEquipe(tarefaId, equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	if TarefaSalvaNoBanco.AutorId != usuarioId {
+		respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel atualizar uma tarefa que não tenha sido você quem criou"))
+		return
+	}
+
+	corpoRequest, erro := ioutil.ReadAll(r.Body)
+	if erro != nil {
+		respostas.Erro(w, http.StatusForbidden, erro)
+		return
+	}
+
+	var Tarefa modelos.Tarefas
+	if erro = json.Unmarshal(corpoRequest, &Tarefa); erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	if erro = repositorio.EditarTarefaDaEquipe(equipeId, tarefaId, Tarefa); erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
 	}
 
 	respostas.JSON(w, http.StatusOK, nil)
 }
 
-func AdicionarUsuario(w http.ResponseWriter, r *http.Request) {
-    usuarioId, erro := autenticacao.ExtrairUsuarioID(r)
+func DeletarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
+    parametros := mux.Vars(r)
+    tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
     if erro != nil {
         respostas.Erro(w, http.StatusBadRequest, erro)
         return
     }
 
-    parametros := mux.Vars(r)
     equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
     if erro != nil {
         respostas.Erro(w, http.StatusBadRequest, erro)
         return
     }
+
+	fmt.Println(equipeId)
+	fmt.Println(tarefaId)
+
 
     db, erro := banco.Conectar()
     if erro != nil {
@@ -459,180 +417,206 @@ func AdicionarUsuario(w http.ResponseWriter, r *http.Request) {
     defer db.Close()
 
     repositorio := repositorios.NovoRepositorioDeEquipes(db)
-    equipeSalvaNoBanco, erro := repositorio.BuscarPorId(equipeId)
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
+	if erro = repositorio.DeletarTarefaDaEquipe(equipeId, tarefaId); erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+	}
 
-    if usuarioId != equipeSalvaNoBanco.AutorId {
-        respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel adicionar um participante se você não for o criador da equipe"))
-        return
-    }
+	respostas.JSON(w, http.StatusOK, nil)
 
-    usuarioAdicionado, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+}
 
-    if erro = repositorio.Adicionar(equipeId, usuarioAdicionado); erro != nil {
-        respostas.Erro(w, http.StatusForbidden, erro)
-        return
-    }
+func AdicionarUsuario(w http.ResponseWriter, r *http.Request) {
+	usuarioId, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
-    respostas.JSON(w, http.StatusOK, nil)
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	equipeSalvaNoBanco, erro := repositorio.BuscarPorId(equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	if usuarioId != equipeSalvaNoBanco.AutorId {
+		respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel adicionar um participante se você não for o criador da equipe"))
+		return
+	}
+
+	usuarioAdicionado, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	if erro = repositorio.Adicionar(equipeId, usuarioAdicionado); erro != nil {
+		respostas.Erro(w, http.StatusForbidden, erro)
+		return
+	}
+
+	respostas.JSON(w, http.StatusOK, nil)
 
 }
 
 func RemoverUsuario(w http.ResponseWriter, r *http.Request) {
-    usuarioLogado, erro := autenticacao.ExtrairUsuarioID(r)
-    if erro != nil {
-        respostas.Erro(w, http.StatusForbidden, erro)
-        return
-    }
+	usuarioLogado, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusForbidden, erro)
+		return
+	}
 
-    parametros := mux.Vars(r)
-    equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
-    usuarioId, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+	usuarioId, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
-    db, erro := banco.Conectar()
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
-    defer db.Close()
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
 
-    repositorio := repositorios.NovoRepositorioDeEquipes(db)
-    equipeSalvaNoBanco, erro := repositorio.BuscarPorId(equipeId)
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	equipeSalvaNoBanco, erro := repositorio.BuscarPorId(equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
 
-    if usuarioLogado != equipeSalvaNoBanco.AutorId {
-        respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel remover um usuario se você não é o adiministrador"))
-        return
-    }
+	if usuarioLogado != equipeSalvaNoBanco.AutorId {
+		respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel remover um usuario se você não é o adiministrador"))
+		return
+	}
 
-    if usuarioLogado == usuarioId {
-        respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel remover o adiministrador"))
-        return
-    }
+	if usuarioLogado == usuarioId {
+		respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel remover o adiministrador"))
+		return
+	}
 
-    if erro = repositorio.Remover(equipeId, usuarioId); erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
+	if erro = repositorio.Remover(equipeId, usuarioId); erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
 
-    respostas.JSON(w, http.StatusOK, nil)
+	respostas.JSON(w, http.StatusOK, nil)
 
 }
 
 func BuscarUsuarioDaEquipe(w http.ResponseWriter, r *http.Request) {
-    usuarioLogado, erro := autenticacao.ExtrairUsuarioID(r)
-    if erro != nil {
-        respostas.Erro(w, http.StatusForbidden, erro)
-        return
-    }
+	usuarioLogado, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusForbidden, erro)
+		return
+	}
 
-    parametros := mux.Vars(r)
-    equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
-    usuarioId, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+	usuarioId, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
-    db, erro := banco.Conectar()
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
-    defer db.Close()
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
 
-    repositorio := repositorios.NovoRepositorioDeEquipes(db)
-    equipeSalvaNoBanco, erro := repositorio.BuscarPorId(equipeId)
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	equipeSalvaNoBanco, erro := repositorio.BuscarPorId(equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
 
+	equipe, participante, erro := repositorio.BuscarParticipante(equipeId, usuarioId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+	}
 
-    equipe, participante, erro := repositorio.BuscarParticipante(equipeId, usuarioId)
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-    }
+	if usuarioLogado != equipeSalvaNoBanco.AutorId && usuarioLogado != participante.Id {
+		respostas.Erro(w, http.StatusUnauthorized, errors.New("Você precisa ser um participante ou dono da equipe para ver todos seus participantes"))
+		return
+	}
 
-    
-    if usuarioLogado != equipeSalvaNoBanco.AutorId && usuarioLogado != participante.Id {
-        respostas.Erro(w, http.StatusUnauthorized, errors.New("Você precisa ser um participante ou dono da equipe para ver todos seus participantes"))
-        return
-    }
-
-
-
-    respostas.JSON(w, http.StatusOK, equipe)
-    respostas.JSON(w, http.StatusOK, participante)
+	respostas.JSON(w, http.StatusOK, equipe)
+	respostas.JSON(w, http.StatusOK, participante)
 }
 
 func BuscarUsuariosDaEquipe(w http.ResponseWriter, r *http.Request) {
-    parametro := mux.Vars(r)
-    equipeId, erro := strconv.ParseUint(parametro["equipeId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+	parametro := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametro["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
-    usuarioLogado, erro := autenticacao.ExtrairUsuarioID(r)
-    if erro != nil {
-        respostas.Erro(w, http.StatusForbidden, erro)
-        return
-    }
+	usuarioLogado, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusForbidden, erro)
+		return
+	}
 
-    db, erro := banco.Conectar()
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
-    defer db.Close()
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
 
-    repositorio := repositorios.NovoRepositorioDeEquipes(db)
-    equipeSalvaNoBanco, erro := repositorio.BuscarPorId(equipeId)
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	equipeSalvaNoBanco, erro := repositorio.BuscarPorId(equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
 
-    _, usuarioLogadoParticipante, erro := repositorio.BuscarParticipante(equipeId, usuarioLogado)
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-    }
+	_, usuarioLogadoParticipante, erro := repositorio.BuscarParticipante(equipeId, usuarioLogado)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+	}
 
-    if usuarioLogado != equipeSalvaNoBanco.AutorId && usuarioLogado != usuarioLogadoParticipante.Id {
-        respostas.Erro(w, http.StatusUnauthorized, errors.New("Você precisa ser um participante ou dono da equipe para ver todos seus participantes"))
-        return
-    }
+	if usuarioLogado != equipeSalvaNoBanco.AutorId && usuarioLogado != usuarioLogadoParticipante.Id {
+		respostas.Erro(w, http.StatusUnauthorized, errors.New("Você precisa ser um participante ou dono da equipe para ver todos seus participantes"))
+		return
+	}
 
-    usuarios, erro := repositorio.BuscarParticipantesDaEquipe(equipeId)
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
+	usuarios, erro := repositorio.BuscarParticipantesDaEquipe(equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
 
-    respostas.JSON(w, http.StatusOK, usuarios)
+	respostas.JSON(w, http.StatusOK, usuarios)
 }

@@ -67,29 +67,27 @@
                 </fieldset>
             </div>
 
-            <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-7">
+            <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-7" data-equipe-id="{{ .Id }}">
             
                 {{ range .Tarefas }}
-
                 <div class="jumbotron" data-tarefa-equipe-id="{{ .Id }}" style="padding: 10px;">
                     <h2 class="display-5"> {{ .Tarefa }} </h2>
                     <p class="lead" style="font-size: 14px;"> {{ .Obsevacao }} </p>
                     <p class="style="font-size: 14px;> {{ .Prazo }}  </p>
-                    <i class="fa-sharp fa-regular fa-circle-check concluir-tarefa" style="cursor: pointer;"></i>
-                    <a href="/tarefas/{{ .Id }}/editar" style="text-decoration: none;">
+                    <i class="fa-sharp fa-regular fa-circle-check concluir-tarefa-equipe" style="cursor: pointer;"></i>
+                    
+                    <a href="/equipes/{{ .Id }}/tarefas" style="text-decoration: none;">
                         <i class="fa-solid fa-pen-to-square"></i>
-                        </a>
-                        <i class="fas fa-trash text-danger deletar-tarefa" style="cursor: pointer;"></i>
+                    </a>
+
+                    <i class="fas fa-trash text-danger deletar-tarefa-equipe" style="cursor: pointer;"></i>
                 </div>
-                
-
-
                 {{ end }}
     
             </div>
         </div>
     </div>
-    
+         
         {{ template "rodape" }}
         {{ template "script" }}
         
