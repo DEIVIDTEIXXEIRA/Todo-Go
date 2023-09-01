@@ -103,3 +103,41 @@ func DeletarEquipe(w http.ResponseWriter, r *http.Request) {
 
 	respostas.JSON(w, response.StatusCode, nil)
 }
+
+//NovaTarefasDeEquipe chama a api para registrar uma nova tarefa para a equipe
+func NovaTarefasDeEquipe(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	tarefa, erro := json.Marshal(map[string]string{
+		"tarefa":     r.FormValue("tarefa"),
+		"observacao": r.FormValue("observacao"),
+		"prazo":      r.FormValue("prazo"),
+	})
+
+	if erro != nil {
+		respostas.JSON(w, http.StatusBadRequest, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/equipes/%d/tarefas", config.APIURL, equipeId)
+	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodPost, url, bytes.NewBuffer(tarefa))
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: erro.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		respostas.TratarStatusCodeDeErro(w, response)
+		return
+	}
+
+	respostas.JSON(w, response.StatusCode, nil)
+}
