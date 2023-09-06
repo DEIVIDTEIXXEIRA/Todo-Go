@@ -309,12 +309,6 @@ func BuscarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
-	if erro != nil {
-		respostas.Erro(w, http.StatusBadRequest, erro)
-		return
-	}
-
 	db, erro := banco.Conectar()
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
@@ -323,7 +317,7 @@ func BuscarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	repositorio := repositorios.NovoRepositorioDeEquipes(db)
-	tarefa, erro := repositorio.BuscarTarefaDaEquipe(tarefaId, equipeId)
+	tarefa, erro := repositorio.BuscarTarefaDaEquipe(tarefaId)
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 		return
@@ -360,7 +354,7 @@ func EditarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	repositorio := repositorios.NovoRepositorioDeEquipes(db)
-	TarefaSalvaNoBanco, erro := repositorio.BuscarTarefaDaEquipe(tarefaId, equipeId)
+	TarefaSalvaNoBanco, erro := repositorio.BuscarTarefaDaEquipe(tarefaId)
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 		return
@@ -392,31 +386,30 @@ func EditarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeletarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
-    parametros := mux.Vars(r)
-    tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+	parametros := mux.Vars(r)
+	tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
-    equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
-    if erro != nil {
-        respostas.Erro(w, http.StatusBadRequest, erro)
-        return
-    }
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
 	fmt.Println(equipeId)
 	fmt.Println(tarefaId)
 
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
 
-    db, erro := banco.Conectar()
-    if erro != nil {
-        respostas.Erro(w, http.StatusInternalServerError, erro)
-        return
-    }
-    defer db.Close()
-
-    repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
 	if erro = repositorio.DeletarTarefaDaEquipe(equipeId, tarefaId); erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 	}

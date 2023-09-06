@@ -4,6 +4,7 @@ $('.deletar-equipe').on("click", deletarEquipe);
 $('.btn-danger').on('click', criarTarefaEquipe);
 $('.concluir-tarefa-equipe').on("click", concluirTarefaDeEquipe);
 $('.deletar-tarefa-equipe').on("click", deletarTarefaDeEquipe);
+$('.editar-tarefa-equipe').on("click", editarTarefaDeEquipe);
 
 function criarEquipe(evento) {
     evento.preventDefault();
@@ -169,3 +170,8 @@ function deletarTarefaDeEquipe(evento) {
         });
     });
 }
+
+function editarTarefaDeEquipe(evento) {
+    
+}
+

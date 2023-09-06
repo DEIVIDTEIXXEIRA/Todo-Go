@@ -116,7 +116,7 @@ func (repositorio Equipe) BuscarEquipesUsuario(usuarioId uint64) ([]modelos.Equi
 
 	return equipes, nil
 }
- 
+
 func (repositorio Equipe) AtualizarEquipe(equipeId uint64, Equipe modelos.Equipes) error {
 	statement, erro := repositorio.db.Prepare("update equipes set nome = ?, descricao = ? where id = ?")
 	if erro != nil {
@@ -195,9 +195,9 @@ func (repositorio Equipe) BuscarTarefasDaEquipe(equipeId uint64) ([]modelos.Tare
 	return tarefasDaEquipe, nil
 }
 
-func (repositorio Equipe) BuscarTarefaDaEquipe(tarefaId, equipeId uint64) (modelos.Tarefas, error) {
-	linha, erro := repositorio.db.Query("select id, autor_id, tarefa, observacao, prazo from tarefas_equipe WHERE equipes_id = ? and id = ?",
-		equipeId, tarefaId,
+func (repositorio Equipe) BuscarTarefaDaEquipe(tarefaId uint64) (modelos.Tarefas, error) {
+	linha, erro := repositorio.db.Query("select id, autor_id, tarefa, observacao, prazo from tarefas_equipe WHERE id = ?",
+		tarefaId,
 	)
 	if erro != nil {
 		return modelos.Tarefas{}, erro
@@ -246,99 +246,99 @@ func (repositorio Equipe) DeletarTarefaDaEquipe(equipeId, tarefaId uint64) error
 	}
 	defer statement.Close()
 
-	if _, erro = statement.Exec(equipeId, tarefaId);erro != nil {
+	if _, erro = statement.Exec(equipeId, tarefaId); erro != nil {
 		return erro
 	}
 
-	return nil 
+	return nil
 }
 
 func (repositorio Equipe) Adicionar(equipeId, usuarioId uint64) error {
 
-    var usuarioNick string
-    erro := repositorio.db.QueryRow(
-        "SELECT nick FROM usuarios WHERE id = ?",
-        usuarioId,
-    ).Scan(&usuarioNick)
-    if erro != nil {
-        return erro
-    }
+	var usuarioNick string
+	erro := repositorio.db.QueryRow(
+		"SELECT nick FROM usuarios WHERE id = ?",
+		usuarioId,
+	).Scan(&usuarioNick)
+	if erro != nil {
+		return erro
+	}
 
-    statement, erro := repositorio.db.Prepare(
-        "insert into usuarios_equipe (equipes_id, usuario_id, usuario_nick) value(?, ?, ?)",
-    )
-    if erro != nil {
-        return erro 
-    }
-    defer statement.Close()
+	statement, erro := repositorio.db.Prepare(
+		"insert into usuarios_equipe (equipes_id, usuario_id, usuario_nick) value(?, ?, ?)",
+	)
+	if erro != nil {
+		return erro
+	}
+	defer statement.Close()
 
-    if _, erro = statement.Exec(equipeId, usuarioId, usuarioNick); erro != nil {
-        return erro 
-    }
+	if _, erro = statement.Exec(equipeId, usuarioId, usuarioNick); erro != nil {
+		return erro
+	}
 
-    return nil 
+	return nil
 }
 
 func (repositorio Equipe) Remover(equipeId, usuarioId uint64) error {
-    statement, erro := repositorio.db.Prepare("DELETE FROM usuarios_equipe WHERE equipes_id = ? AND usuario_id = ?")
-    if erro != nil {
-        return erro 
-    }
-    defer statement.Close()
+	statement, erro := repositorio.db.Prepare("DELETE FROM usuarios_equipe WHERE equipes_id = ? AND usuario_id = ?")
+	if erro != nil {
+		return erro
+	}
+	defer statement.Close()
 
-    if _, erro := statement.Exec(equipeId, usuarioId); erro != nil {
-        return erro
-    }
+	if _, erro := statement.Exec(equipeId, usuarioId); erro != nil {
+		return erro
+	}
 
-    return nil
+	return nil
 }
 
 func (repositorio Equipe) BuscarParticipante(equipeId, usuarioId uint64) (modelos.Equipes, modelos.Usuarios, error) {
-    linha, erro := repositorio.db.Query("select equipes_id, usuario_id, usuario_nick from usuarios_equipe where equipes_id = ? and usuario_id = ?",
-        equipeId, usuarioId,
-    )
-    if erro != nil {
-        return modelos.Equipes{}, modelos.Usuarios{}, erro
-    }
-    defer linha.Close()
+	linha, erro := repositorio.db.Query("select equipes_id, usuario_id, usuario_nick from usuarios_equipe where equipes_id = ? and usuario_id = ?",
+		equipeId, usuarioId,
+	)
+	if erro != nil {
+		return modelos.Equipes{}, modelos.Usuarios{}, erro
+	}
+	defer linha.Close()
 
-    var Equipe modelos.Equipes
-    var Usuario modelos.Usuarios
+	var Equipe modelos.Equipes
+	var Usuario modelos.Usuarios
 
-    if linha.Next() {
-        if erro = linha.Scan(
-            &Equipe.Id,
-            &Usuario.Id,
-            &Usuario.Nick,
-        ); erro != nil {
-            return modelos.Equipes{}, modelos.Usuarios{}, erro
-        }
-    }
+	if linha.Next() {
+		if erro = linha.Scan(
+			&Equipe.Id,
+			&Usuario.Id,
+			&Usuario.Nick,
+		); erro != nil {
+			return modelos.Equipes{}, modelos.Usuarios{}, erro
+		}
+	}
 
-    return Equipe, Usuario, nil
+	return Equipe, Usuario, nil
 }
 
 func (repositorio Equipe) BuscarParticipantesDaEquipe(equipeId uint64) ([]modelos.Usuarios, error) {
-    linhas, erro := repositorio.db.Query("select usuario_id, usuario_nick from usuarios_equipe where equipes_id = ?", equipeId)
-    if erro != nil {
-        return nil, erro
-    }
-    defer linhas.Close()
+	linhas, erro := repositorio.db.Query("select usuario_id, usuario_nick from usuarios_equipe where equipes_id = ?", equipeId)
+	if erro != nil {
+		return nil, erro
+	}
+	defer linhas.Close()
 
-    var usuarios []modelos.Usuarios
+	var usuarios []modelos.Usuarios
 
-    for linhas.Next() {
-        var usuario modelos.Usuarios
+	for linhas.Next() {
+		var usuario modelos.Usuarios
 
-        if erro = linhas.Scan(
-            &usuario.Id,
-            &usuario.Nick,
-        ); erro != nil {
-            return nil, erro 
-        }
+		if erro = linhas.Scan(
+			&usuario.Id,
+			&usuario.Nick,
+		); erro != nil {
+			return nil, erro
+		}
 
-        usuarios = append(usuarios, usuario)
-    }
+		usuarios = append(usuarios, usuario)
+	}
 
-    return usuarios, nil 
+	return usuarios, nil
 }

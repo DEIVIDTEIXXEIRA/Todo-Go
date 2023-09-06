@@ -44,9 +44,11 @@ func BuscarUsuarioCompleto(usuarioId uint64, r *http.Request) (Usuario, error) {
 
         case tarefasCarregadas := <-canalTarefas:
             if tarefasCarregadas == nil {
-                return Usuario{}, errors.New("Erro ao buscar tarefas")
+				tarefas = []Tarefas{}
+			} else {
+                tarefas = tarefasCarregadas
             }
-            tarefas = tarefasCarregadas
+            
 
         case equipesCarregadas := <-canalEquipes:
             if equipesCarregadas == nil {
