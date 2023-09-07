@@ -4,7 +4,7 @@ $('.deletar-equipe').on("click", deletarEquipe);
 $('.btn-danger').on('click', criarTarefaEquipe);
 $('.concluir-tarefa-equipe').on("click", concluirTarefaDeEquipe);
 $('.deletar-tarefa-equipe').on("click", deletarTarefaDeEquipe);
-$('.editar-tarefa-equipe').on("click", editarTarefaDeEquipe);
+$('#atualizar-tarefa-equipe').on("click", editarTarefaDeEquipe);
 
 function criarEquipe(evento) {
     evento.preventDefault();
@@ -172,6 +172,31 @@ function deletarTarefaDeEquipe(evento) {
 }
 
 function editarTarefaDeEquipe(evento) {
+    $(this).prop('disabled', true);
+
+    const tarefaId = $(this).data('tarefa-equipe-id');
+    
+    $.ajax({
+        url: `/tarefas/${tarefaId}/equipe`,
+        method: "PUT",
+        data: {
+            tarefa: $('#tarefa').val(),
+            observacao: $('#observacao').val(),
+            prazo: $('#prazo').val()
+        }
+    }).done(function() {
+        Swal.fire( 
+            'Sucesso',
+            'Tarefa atualizada com sucesso!',
+            'success')
+            .then(function() {
+                window.location = "/home";
+            });
+        }).fail(function() {
+            Swal.fire("Ops...", "Falha em editar a tarefa!!", "error");
+    }).always(function() {
+        $('#atualizar-tarefa').prop('disabled', false)
+    });
     
 }
 

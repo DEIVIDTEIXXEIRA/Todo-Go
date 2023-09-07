@@ -221,16 +221,16 @@ func (repositorio Equipe) BuscarTarefaDaEquipe(tarefaId uint64) (modelos.Tarefas
 	return tarefa, nil
 }
 
-func (repositorio Equipe) EditarTarefaDaEquipe(equipeId uint64, tarefaId uint64, Tarefa modelos.Tarefas) error {
+func (repositorio Equipe) EditarTarefaDaEquipe(tarefaId uint64, Tarefa modelos.Tarefas) error {
 	statement, erro := repositorio.db.Prepare(
-		"update tarefas_equipe set tarefa = ?, observacao = ?, prazo = ? where equipes_id = ? and id = ? ",
+		"update tarefas_equipe set tarefa = ?, observacao = ?, prazo = ? where equipes_id = ?",
 	)
 	if erro != nil {
 		return erro
 	}
 	defer statement.Close()
 
-	if _, erro := statement.Exec(Tarefa.Tarefa, Tarefa.Obsevacao, Tarefa.Prazo, equipeId, tarefaId); erro != nil {
+	if _, erro := statement.Exec(Tarefa.Tarefa, Tarefa.Obsevacao, Tarefa.Prazo, tarefaId); erro != nil {
 		return erro
 	}
 

@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo-List - Atualizar tarefa - {{ . }} </title>
+    <title>Todo-List - Atualizar tarefa - {{ .Tarefa }} </title>
     <link href="/assets/css/bootstrap.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
@@ -17,12 +17,12 @@
 
                <div class="form-group">
                      <label for="titulo">Tarefa</label>
-                     <input type="text" class="form-control" id="tarefa" name="tarefa" placeholder="Insira a tarefa" value="{{ .Tarefa }}">
+                     <input type="text" class="form-control" id="tarefa-equipe" name="tarefa-equipe" placeholder="Insira a tarefa" value="{{ .Tarefa }}">
                 </div>
 
                 <div class="form-group">
                     <label for="conteudo">Observação</label>
-                    <textarea class="form-control" id="observacao" name="observacao" placeholder="Escreva sua observação.">{{ .Obsevacao }}</textarea>
+                    <textarea class="form-control" id="observacao-equipe" name="observacao-equipe" placeholder="Escreva sua observação.">{{ .Obsevacao }}</textarea>
                 </div>
 
                 <div class="form-group">

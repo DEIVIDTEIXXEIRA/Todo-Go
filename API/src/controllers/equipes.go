@@ -327,20 +327,8 @@ func BuscarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func EditarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
-	usuarioId, erro := autenticacao.ExtrairUsuarioID(r)
-	if erro != nil {
-		respostas.Erro(w, http.StatusBadRequest, erro)
-		return
-	}
-
 	parametros := mux.Vars(r)
 	tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
-	if erro != nil {
-		respostas.Erro(w, http.StatusBadRequest, erro)
-		return
-	}
-
-	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
 	if erro != nil {
 		respostas.Erro(w, http.StatusBadRequest, erro)
 		return
@@ -352,18 +340,6 @@ func EditarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer db.Close()
-
-	repositorio := repositorios.NovoRepositorioDeEquipes(db)
-	TarefaSalvaNoBanco, erro := repositorio.BuscarTarefaDaEquipe(tarefaId)
-	if erro != nil {
-		respostas.Erro(w, http.StatusInternalServerError, erro)
-		return
-	}
-
-	if TarefaSalvaNoBanco.AutorId != usuarioId {
-		respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel atualizar uma tarefa que não tenha sido você quem criou"))
-		return
-	}
 
 	corpoRequest, erro := ioutil.ReadAll(r.Body)
 	if erro != nil {
@@ -377,7 +353,8 @@ func EditarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro = repositorio.EditarTarefaDaEquipe(equipeId, tarefaId, Tarefa); erro != nil {
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	if erro = repositorio.EditarTarefaDaEquipe(tarefaId, Tarefa); erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
