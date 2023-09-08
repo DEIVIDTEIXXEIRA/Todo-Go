@@ -157,7 +157,7 @@ func ConcluirEDeletarTarefaDeEquipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := fmt.Sprintf("%s/equipes/%d/tarefas/%b", config.APIURL, equipeId, tarefaId)
+	url := fmt.Sprintf("%s/equipes/%d/tarefas/%d", config.APIURL, equipeId, tarefaId)
 	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodDelete, url, nil)
 	if erro != nil {
 		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: erro.Error()})

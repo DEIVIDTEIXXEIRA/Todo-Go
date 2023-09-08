@@ -156,8 +156,6 @@ function deletarTarefaDeEquipe(evento) {
 
         const equipeId = $('.col-xs-12.col-sm-12.col-md-7.col-lg-7.col-xl-7').data('equipe-id');
 
-        console.log("Tarefa ID:", tarefaId);
-
         $.ajax({
             url: `/equipes/${equipeId}/tarefas/${tarefaId}`,
             method: "DELETE"
