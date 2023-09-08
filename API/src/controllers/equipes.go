@@ -353,6 +353,11 @@ func EditarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if erro = Tarefa.Preparar(); erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
 	repositorio := repositorios.NovoRepositorioDeEquipes(db)
 	if erro = repositorio.EditarTarefaDaEquipe(tarefaId, Tarefa); erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)

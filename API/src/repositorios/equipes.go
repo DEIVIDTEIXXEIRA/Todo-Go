@@ -223,7 +223,7 @@ func (repositorio Equipe) BuscarTarefaDaEquipe(tarefaId uint64) (modelos.Tarefas
 
 func (repositorio Equipe) EditarTarefaDaEquipe(tarefaId uint64, Tarefa modelos.Tarefas) error {
 	statement, erro := repositorio.db.Prepare(
-		"update tarefas_equipe set tarefa = ?, observacao = ?, prazo = ? where equipes_id = ?",
+		"update tarefas_equipe set tarefa = ?, observacao = ?, prazo = ? where id = ?",
 	)
 	if erro != nil {
 		return erro

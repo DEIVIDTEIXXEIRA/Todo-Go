@@ -195,7 +195,7 @@ func AtualizarTarefaDeEquipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := fmt.Sprintf("%s/tarefas/%d", config.APIURL, tarefaId)
+	url := fmt.Sprintf("%s/equipe/%d/tarefa", config.APIURL, tarefaId)
 	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodPut, url, bytes.NewBuffer(tarefa))
 	if erro != nil {
 		respostas.JSON(w, http.StatusInternalServerError, respostas.Erro{Erro: erro.Error()})

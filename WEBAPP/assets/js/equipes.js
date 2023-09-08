@@ -190,7 +190,7 @@ function editarTarefaDeEquipe(evento) {
             'Tarefa atualizada com sucesso!',
             'success')
             .then(function() {
-                window.location = "/home";
+                window.location = "/equipe";
             });
         }).fail(function() {
             Swal.fire("Ops...", "Falha em editar a tarefa!!", "error");
